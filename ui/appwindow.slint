@@ -15,8 +15,9 @@ global App {
 }
 
 export component AppWindow inherits Window {
+    title: "MyDapps";
     preferred-height: 800px;
-    width: 400px;
+    min-width: 400px;
     in-out property<Chain> active-chain: App.chain;
     in-out property<Dapp> active-dapp: App.dapp;
     in property <[int]> balances;

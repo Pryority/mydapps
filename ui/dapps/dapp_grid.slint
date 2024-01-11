@@ -1,7 +1,7 @@
 import { UniswapTile } from "tiles/uniswap_tile.slint";
 import { SafeTile } from "tiles/safe_tile.slint";
 import { GridBox } from "std-widgets.slint";
-export component DappGrid inherits Window {
+export component DappGrid {
     height: 256px;
     
     Rectangle {
@@ -15,13 +15,13 @@ export component DappGrid inherits Window {
             Row {
                 UniswapTile {}
                 SafeTile {}
-                SafeTile {}
+                // SafeTile {}
             }
-            Row {
-                SafeTile {}
-                UniswapTile {}
-                UniswapTile {}
-            }
+            // Row {
+            //     SafeTile {}
+            //     UniswapTile {}
+            //     UniswapTile {}
+            // }
         }
     }
 }
