@@ -1,14 +1,20 @@
 import { Button, VerticalBox, StandardListView, LineEdit } from "std-widgets.slint";
-import { ChainSelect } from "./chain_select.slint";
+import { ChainSelect } from "chain_select.slint";
+import { DappTile } from "dapp_tile.slint";
+import { Uniswap } from "dapps/uniswap.slint";
 
-struct Chain {
+export struct Chain {
     name: string,
     chain_id: int,
 }
 
+global App {
+    in-out property <Chain> chain: {name: "Ethereum", chain_id: 1};
+}
+
 export component AppWindow inherits Window {
     in-out property<string> dapp: "Uniswap";
-    in-out property<Chain> chain: {name: "Ethereum", chain_id: 1};
+    in-out property<Chain> chain: App.chain;
     in property <[int]> balances;
     property <bool> active: true;
 
@@ -17,18 +23,39 @@ export component AppWindow inherits Window {
     callback request-send-tokens <=> SEND_btn.clicked;
 
     VerticalBox {
-        ChainSelect {}
+        ChainSelect {
+            // chain-updated => {
+            //     // Update the global App.chain
+            //     return chain; 
+            // }
+        }
+
 
         // DAPP
-        uniswapBtn := Button {
-            text: "Uniswap";
-            clicked => {
-                root.request-open-dapp();
+        // uniswapBtn := Button {
+        //     text: "Uniswap";
+        //     clicked => {
+        //         root.request-open-dapp();
+        //     }
+        // }
+        GridLayout {
+            spacing: 6px;
+            Row {
+                Uniswap {}
+                Uniswap {}
+                Uniswap {}
             }
+            Row {
+                Uniswap {}
+                Uniswap {}
+                Uniswap {}
+            }
+            // DappTile {}
+            // DappTile {}
         }
 
         Text {
-            text: "Current chain: " + chain.name;
+            text: "Current chain: " + root.chain.name; 
         }
 
         BALANCES_btn := Button {

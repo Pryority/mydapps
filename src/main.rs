@@ -10,6 +10,12 @@ fn main() -> Result<(), slint::PlatformError> {
         ui.set_dapp(ui.get_dapp());
     });
 
+    // ui.on_request_active_chain(move || {
+    //     let ui = ui_handle.unwrap();
+    //     println!("{}", ui.get_active_chain());
+    //     ui.get_active_chain();
+    // });
+
     ui.on_request_send_tokens(move || {
         println!("Sent 0.25 ETH to vitalik.eth!");
     });

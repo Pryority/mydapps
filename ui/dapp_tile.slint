@@ -1,0 +1,13 @@
+import { Button } from "std-widgets.slint";
+export component DappTile inherits Rectangle {
+    width: 64px;
+    height: 64px;
+    background: #f7f7f7;
+    in property <image> logo;
+
+    Image {
+        source: logo;
+        width: parent.width;
+        height: parent.height;
+    }
+}
