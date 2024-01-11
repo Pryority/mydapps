@@ -2,7 +2,8 @@
 
 An Ethereum-based desktop application that works in embedded devices...?
 
-![MyDapps Demo](./mydapps-demo.png)
+![MyDapps Demo](./mydapps-demo-closeup.png)
+![MyDapps Desktop Demo](./mydapps-demo-desktop.png)
 
 ## Usage
 
