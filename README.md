@@ -1,6 +1,7 @@
-# MyDapps - Learning Slint & Rust
+# MyDapps
 
-An Ethereum-based desktop application that works in embedded devices...?
+I am experimenting, learning [Slint](https://github.com/slint-ui/slint/blob/master/tools/lsp/README.md) & Rust, so I wanted to attempt to make an Ethereum-based desktop application (that works in embedded devices...?). Ideally it could interact with Ethereum using a Rust-based light client like [Helios](https://github.com/a16z/helios)
+
 <!-- markdownlint-disable MD033 -->
 <div align="center">
    <img src="./mydapps-demo-closeup.png" alt="MyDapps App Demo"/>
