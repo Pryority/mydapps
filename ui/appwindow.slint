@@ -1,69 +1,50 @@
 import { Button, VerticalBox, StandardListView, LineEdit } from "std-widgets.slint";
 import { ChainSelect } from "chain_select.slint";
-import { DappTile } from "dapp_tile.slint";
-import { Uniswap } from "dapps/uniswap.slint";
-
+import { DappGrid } from "dapps/dapp_grid.slint";
+import { SendSVG } from "send_svg.slint";
+import { SendButton } from "send_button.slint";
+import { Dapp } from "dapps/dapp.slint";
 export struct Chain {
     name: string,
     chain_id: int,
 }
 
 global App {
+    in-out property <Dapp> dapp;
     in-out property <Chain> chain: {name: "Ethereum", chain_id: 1};
 }
 
 export component AppWindow inherits Window {
-    in-out property<string> dapp: "Uniswap";
-    in-out property<Chain> chain: App.chain;
+    preferred-height: 800px;
+    width: 400px;
+    in-out property<Chain> active-chain: App.chain;
+    in-out property<Dapp> active-dapp: App.dapp;
     in property <[int]> balances;
-    property <bool> active: true;
 
     callback request-open-dapp();
     callback request-all-balances <=> BALANCES_btn.clicked;
-    callback request-send-tokens <=> SEND_btn.clicked;
+    callback request-send-tokens();
+    callback request-dapp-config(Dapp);
 
     VerticalBox {
-        ChainSelect {
-            // chain-updated => {
-            //     // Update the global App.chain
-            //     return chain; 
-            // }
-        }
+        ChainSelect {}
 
-
-        // DAPP
-        // uniswapBtn := Button {
-        //     text: "Uniswap";
-        //     clicked => {
-        //         root.request-open-dapp();
-        //     }
-        // }
-        GridLayout {
-            spacing: 6px;
-            Row {
-                Uniswap {}
-                Uniswap {}
-                Uniswap {}
-            }
-            Row {
-                Uniswap {}
-                Uniswap {}
-                Uniswap {}
-            }
-            // DappTile {}
-            // DappTile {}
-        }
+        DappGrid {}
 
         Text {
-            text: "Current chain: " + root.chain.name; 
+            text: "Active: " + root.active-chain.name; 
+            height: 32px;
         }
 
         BALANCES_btn := Button {
             text: "Balances";
+            height: 32px;
         }
 
-        SEND_btn := Button {
-            text: "Send";
+        SendButton {
+            request-send-tokens => {
+                root.request-send-tokens();
+            }
         }
     }    
 }

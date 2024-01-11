@@ -1,26 +1,24 @@
 import { Button } from "std-widgets.slint";
-// import { Chain } from "./appwindow.slint";
 
 export component ChainSelect inherits Window {
-    preferred-height: 200px;
+    height: 200px;
     in-out property <int> active-tab: 0;
     in-out property <string> active-chain: "Ethereum";
-    callback chain-updated(int, string);
 
     VerticalLayout {
         tab_bar := HorizontalLayout {
             spacing: 3px;
             Button {
                 text: "ETH";
-                clicked => { root.chain-updated(0, "Ethereum"); }
+                clicked => { root.active-tab = 0; root.active-chain = "Ethereum"; }
             }
             Button {
                 text: "OP";
-                clicked => { root.chain-updated(1, "Optimism"); }
+                clicked => { root.active-tab = 1; root.active-chain = "Optimism"; }
             }
             Button {
                 text: "ARB";
-                clicked => { root.chain-updated(2, "Arbitrum");}
+                clicked => { root.active-tab = 2; root.active-chain = "Arbitrum";}
             }
         }
         Rectangle {

@@ -1,0 +1,49 @@
+import { SendSVG } from "send_svg.slint";
+import { HorizontalBox } from "std-widgets.slint";
+export component SendButton inherits Rectangle {
+    height: 80px;
+    property <bool> send_seq_active: true;
+
+    callback request-send-tokens();
+    
+    ta := TouchArea {
+        width: 80px;
+        height: 40px;
+        clicked => {
+            send_seq_active = !send_seq_active;
+            root.request-send-tokens();
+        }
+        container := Rectangle {
+            background: ta.pressed ? #50851f : #bababa;
+            border-radius: 4px;
+            animate background {
+                duration: 20ms;
+            }
+            HorizontalBox {
+                padding-right: 40px;
+                spacing: 24px;
+                alignment: center;
+                
+                HorizontalLayout {
+                    spacing: 16px;
+                    btnText := Text {
+                        text: "Send";
+                        color: ta.pressed ? #0d1106 : #1e1e1e;
+                    }
+                    Rectangle {
+                        icon := SendSVG {
+                            stroke: ta.pressed ? #0d1106 : #1e1e1e;
+                        }
+                    }
+                }
+            }
+        }
+    } 
+    states [
+        active-hover when !ta.pressed && ta.has-hover: {
+            container.background: #90ee39;
+            btnText.color: #0f1308;
+            icon.stroke:  #0f1308;
+        }
+    ]
+}

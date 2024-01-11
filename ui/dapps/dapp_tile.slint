@@ -1,0 +1,18 @@
+import { Button } from "std-widgets.slint";
+import { Dapp } from "dapp.slint";
+export component DappTile inherits TouchArea {
+    horizontal-stretch: 100;
+    vertical-stretch: 100;
+    in property <Dapp> dapp;
+    // callback request-dapp-config(Dapp);
+
+    // clicked => {
+    //     root.request-dapp-config(dapp);
+    // }
+
+    Image {
+        source: dapp.logo;
+        width: parent.width;
+        height: parent.height;
+    }
+}
