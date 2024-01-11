@@ -1,6 +1,8 @@
-# MyDapps -
+# MyDapps - Learning Slint & Rust
 
 An Ethereum-based desktop application that works in embedded devices...?
+
+![MyDapps Demo](./mydapps-demo.png)
 
 ## Usage
 
