@@ -1,9 +1,10 @@
 # MyDapps - Learning Slint & Rust
 
 An Ethereum-based desktop application that works in embedded devices...?
+<!-- markdownlint-disable MD033 -->
+<div style="text-align:center"><img src="./mydapps-demo-closeup.png" alt="MyDapps App Demo"/></div>
+<div style="text-align:center"><img src="./mydapps-demo-desktop.png" alt="MyDapps Desktop Demo"/></div>
 
-![MyDapps Demo](./mydapps-demo-closeup.png)
-![MyDapps Desktop Demo](./mydapps-demo-desktop.png)
 
 ## Usage
 
