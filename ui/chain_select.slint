@@ -1,0 +1,51 @@
+import { Button } from "std-widgets.slint";
+
+export component ChainSelect inherits Window {
+    preferred-height: 200px;
+    in-out property <int> active-tab: 0;
+    in-out property <string> active-chain: "Ethereum";
+    VerticalLayout {
+        tab_bar := HorizontalLayout {
+            spacing: 3px;
+            Button {
+                text: "ETH";
+                clicked => { root.active-tab = 0; root.active-chain = "Ethereum"; }
+            }
+            Button {
+                text: "OP";
+                clicked => { root.active-tab = 1; root.active-chain = "Optimism"; }
+            }
+            Button {
+                text: "ARB";
+                clicked => { root.active-tab = 2; root.active-chain = "Arbitrum";}
+            }
+        }
+        Rectangle {
+            clip: true;
+            Rectangle {
+                background: gray;
+                x: root.active-tab == 0 ? 0 : root.active-tab < 0 ? - self.width - 1px : parent.width + 1px;
+                animate x { duration: 125ms; easing: ease; }
+                    Text {
+                    text: root.active-chain;
+                }
+            }
+            Rectangle {
+                background: red;
+                x: root.active-tab == 1 ? 0 : root.active-tab < 1 ? - self.width - 1px : parent.width + 1px;
+                animate x { duration: 125ms; easing: ease; }
+                Text {
+                    text: root.active-chain;
+                }
+            }
+            Rectangle {
+                background: blue;
+                x: root.active-tab == 2 ? 0 : root.active-tab < 2 ? - self.width - 1px : parent.width + 1px;
+                animate x { duration: 125ms; easing: ease; }
+                Text {
+                    text: root.active-chain;
+                }
+            }
+        }
+    }
+}

@@ -1,0 +1,42 @@
+import { Button, VerticalBox, StandardListView, LineEdit } from "std-widgets.slint";
+import { ChainSelect } from "./chain_select.slint";
+
+struct Chain {
+    name: string,
+    chain_id: int,
+}
+
+export component AppWindow inherits Window {
+    in-out property<string> dapp: "Uniswap";
+    in-out property<Chain> chain: {name: "Ethereum", chain_id: 1};
+    in property <[int]> balances;
+    property <bool> active: true;
+
+    callback request-open-dapp();
+    callback request-all-balances <=> BALANCES_btn.clicked;
+    callback request-send-tokens <=> SEND_btn.clicked;
+
+    VerticalBox {
+        ChainSelect {}
+
+        // DAPP
+        uniswapBtn := Button {
+            text: "Uniswap";
+            clicked => {
+                root.request-open-dapp();
+            }
+        }
+
+        Text {
+            text: "Current chain: " + chain.name;
+        }
+
+        BALANCES_btn := Button {
+            text: "Balances";
+        }
+
+        SEND_btn := Button {
+            text: "Send";
+        }
+    }    
+}
