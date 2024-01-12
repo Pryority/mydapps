@@ -8,7 +8,11 @@ build = "build.rs"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+helios = { git = "https://github.com/a16z/helios" }
 slint = "1.0"
+tokio = { version = "1", features = ["rt", "sync", "macros"] }
+eyre = "0.6.8"
+ethers = "2.0.11"
 
 [build-dependencies]
 slint-build = "1.0"

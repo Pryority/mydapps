@@ -1,13 +1,39 @@
 slint::include_modules!();
-// slint::slint!(import { DappTile } from "../ui/dapps/dapp_tile.slint";);
+use helios::{
+    // checkpoints::CheckpointFallback,
+    config::{checkpoints, networks},
+};
+use tokio::spawn;
 
-fn main() -> Result<(), slint::PlatformError> {
+#[tokio::main]
+async fn main() -> Result<(), slint::PlatformError> {
     // Create an instance of the generated component
-    let mut ui = AppWindow::new()?;
+    let ui = AppWindow::new()?;
 
     // Clone strong handles for properties
     let active_dapp_handle = ui.as_weak();
     let active_chain_handle = ui.as_weak();
+    // let checkpoint_handle = ui.as_weak();
+
+    // HELIOS ---------------------------------
+    let cf = checkpoints::CheckpointFallback::new()
+    .build()
+    .await
+    .unwrap();
+
+    ui.on_fetch_latest_mainnet_checkpoint(move || {
+        // let ui = checkpoint_handle.unwrap();
+        let cf_clone = cf.clone();
+        spawn(async move {
+            let mainnet_checkpoint = cf_clone
+                .fetch_latest_checkpoint(&networks::Network::MAINNET)
+                .await
+                .unwrap();
+    
+            // Fetch the latest mainnet checkpoint
+            println!("Fetched latest mainnet checkpoint: {mainnet_checkpoint}");
+        });
+    });
 
     // DAPPS ----------------------------------
     ui.on_select_dapp(move |d| {
@@ -16,7 +42,9 @@ fn main() -> Result<(), slint::PlatformError> {
         let dapp = ui.get_active_dapp();
         println!("Active Dapp: {:?}", dapp.name);
     });
-
+    
+    
+    // CHAINS ---------------------------------
     ui.on_select_chain(move |c| {
         let ui = active_chain_handle.unwrap();
         let chain = ui.get_active_chain();
@@ -26,15 +54,12 @@ fn main() -> Result<(), slint::PlatformError> {
     });
 
     // PERSONAL -------------------------------
-
     ui.on_request_send_tokens(move || {
         println!("Initiating SEND sequence.");
     });
 
     ui.on_request_all_balances(move || {
         println!("100 ETH, 30,000 OP, 4.2 BTC");
-        // let balances = [100, 30_000, 42];
-        // ui.set_balances(balances.into());
     });
 
     ui.run()
