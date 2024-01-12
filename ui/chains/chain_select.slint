@@ -14,25 +14,25 @@ export component ChainSelect {
             Button {
                 text: "ETH";
                 clicked => {
+                    root.active-chain.name = "Ethereum";
                     root.select-chain(root.active-chain);
                     root.active-tab = 0;
-                    root.active-chain.name = "Ethereum";
                 }
             }
             Button {
                 text: "OP";
                 clicked => { 
+                    root.active-chain.name = "Optimism";
                     root.select-chain(root.active-chain);
                     root.active-tab = 1;
-                    root.active-chain.name = "Optimism";
                 }
             }
             Button {
                 text: "ARB";
                 clicked => { 
+                    root.active-chain.name = "Arbitrum";
                     root.select-chain(root.active-chain);
                     root.active-tab = 2;
-                    root.active-chain.name = "Arbitrum";
                 }
             }
         }
