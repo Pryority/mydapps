@@ -5,7 +5,7 @@ I am experimenting, learning [Slint](https://github.com/slint-ui/slint/blob/mast
 <!-- markdownlint-disable MD033 -->
 <div align="center">
    <img src="./assets/mydapps-demo-closeup.png" alt="MyDapps App Demo"/>
-   <img src="./assets/mydapps-demo-desktop.png" alt="MyDapps Desktop Demo"/>
+   <img src="./assets/mydapps-demo.gif" alt="MyDapps Desktop Demo"/>
 </div>
 
 
