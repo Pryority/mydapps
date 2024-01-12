@@ -8,7 +8,6 @@ I am experimenting, learning [Slint](https://github.com/slint-ui/slint/blob/mast
    <img src="./assets/mydapps-demo.gif" alt="MyDapps Desktop Demo"/>
 </div>
 
-
 ## Usage
 
 1. Install Rust by following the [Rust Getting Started Guide](https://www.rust-lang.org/learn/get-started).
