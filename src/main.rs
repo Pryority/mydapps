@@ -3,7 +3,6 @@ use helios::{
     // checkpoints::CheckpointFallback,
     config::{checkpoints, networks},
 };
-use tokio::spawn;
 
 #[tokio::main]
 async fn main() -> Result<(), slint::PlatformError> {
@@ -13,26 +12,26 @@ async fn main() -> Result<(), slint::PlatformError> {
     // Clone strong handles for properties
     let active_dapp_handle = ui.as_weak();
     let active_chain_handle = ui.as_weak();
-    // let checkpoint_handle = ui.as_weak();
+    let checkpoint_handle = ui.as_weak();
 
     // HELIOS ---------------------------------
     let cf = checkpoints::CheckpointFallback::new()
-    .build()
-    .await
-    .unwrap();
+        .build()
+        .await
+        .unwrap();
+    let cf_clone = cf.clone();
+
+    let mainnet_checkpoint = cf_clone
+        .fetch_latest_checkpoint(&networks::Network::MAINNET)
+        .await
+        .unwrap();
 
     ui.on_fetch_latest_mainnet_checkpoint(move || {
-        // let ui = checkpoint_handle.unwrap();
-        let cf_clone = cf.clone();
-        spawn(async move {
-            let mainnet_checkpoint = cf_clone
-                .fetch_latest_checkpoint(&networks::Network::MAINNET)
-                .await
-                .unwrap();
-    
-            // Fetch the latest mainnet checkpoint
-            println!("Fetched latest mainnet checkpoint: {mainnet_checkpoint}");
-        });
+        let ui = checkpoint_handle.unwrap();
+
+        // Fetch the latest mainnet checkpoint
+        println!("Fetched latest mainnet checkpoint: {mainnet_checkpoint}");
+        ui.set_latest_checkpoint(mainnet_checkpoint.to_string().into());
     });
 
     // DAPPS ----------------------------------
@@ -42,8 +41,7 @@ async fn main() -> Result<(), slint::PlatformError> {
         let dapp = ui.get_active_dapp();
         println!("Active Dapp: {:?}", dapp.name);
     });
-    
-    
+
     // CHAINS ---------------------------------
     ui.on_select_chain(move |c| {
         let ui = active_chain_handle.unwrap();
