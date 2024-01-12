@@ -19,7 +19,7 @@ export component DappGrid {
             Row {
                 UniswapTile {
                     select-dapp => {
-                        debug("UniswapTile:", self.dapp);
+                        // debug("Selected Dapp:", self.dapp.name);
                         active-dapp = self.dapp;
                         root.select-dapp(self.dapp);
                         return active-dapp;
@@ -28,7 +28,7 @@ export component DappGrid {
                 
                 SafeTile {
                     select-dapp => {
-                        debug("SafeTile:", self.dapp);
+                        // debug("SafeTile:", self.dapp);
                         active-dapp = self.dapp;
                         root.select-dapp(self.dapp);
                         return active-dapp;

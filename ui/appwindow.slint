@@ -1,4 +1,4 @@
-import { Button, VerticalBox, StandardListView, LineEdit } from "std-widgets.slint";
+import { Button, VerticalBox, StandardListView, LineEdit , HorizontalBox} from "std-widgets.slint";
 import { ChainSelect } from "chains/chain_select.slint";
 import { DappGrid } from "dapps/dapp_grid.slint";
 import { SendSVG } from "send_svg.slint";
@@ -19,7 +19,7 @@ export component AppWindow inherits Window {
     in-out property<Dapp> active-dapp: App.dapp;
     in property <[int]> balances;
     in property <string> latest_checkpoint;
-    in property <bool> sync_status;
+    in-out property <bool> sync_status;
 
     callback request-all-balances <=> BALANCES_btn.clicked;
     callback request-send-tokens();
@@ -30,10 +30,6 @@ export component AppWindow inherits Window {
     callback sync();
 
     VerticalBox {
-        Text {
-            text: sync-status == true ? "Synced" : "Resynchronize";
-        }
-
         ChainSelect {
             select-chain => {
                 // debug("AppWindow Chain: ", self.active-chain.name);
@@ -45,7 +41,7 @@ export component AppWindow inherits Window {
 
         DappGrid {
             select-dapp => {
-                debug("AppWindow Dapp: ", self.active-dapp.name);
+                // debug("AppWindow Dapp: ", self.active-dapp.name);
                 root.select-dapp(self.active-dapp);
                 return self.active-dapp;
             }
@@ -62,27 +58,44 @@ export component AppWindow inherits Window {
             }
         }
 
-        BALANCES_btn := Button {
-            text: "Balances";
-            height: 32px;
-        }
+        HorizontalBox {
+            VerticalBox {
+                min-width: 256px;
 
-        VerticalBox {
-            Button {
-                text: "Fetch Mainnet Checkpoint";
-                clicked => {
-                    root.fetch-latest-mainnet-checkpoint();
+                BALANCES_btn := Button {
+                    text: "Balances";
+                    height: 32px;
                 }
-            }
+            
+                HorizontalBox {
+                    Button {
+                        text: "Sync";
+                        height: 32px;
+                        clicked => {
+                            root.fetch-latest-mainnet-checkpoint();
+                            root.sync();
+                        }
+                    }
+                    Button {
+                        text: "⏸️";
+                        clicked => {
+                            root.sync-status = false;
+                        }
+                    }
+                }
 
-            Text {
-                text: "Latest Checkpoint: " + root.latest-checkpoint;
-            }
-        } 
+                Text {
+                    text: root.sync-status == true ? "Synced" : "Paused";
+                }
 
-        SendButton {
-            request-send-tokens => {
-                root.request-send-tokens();
+                Text {
+                    text: "Latest Checkpoint: " + root.latest-checkpoint;
+                }
+            } 
+            SendButton {
+                request-send-tokens => {
+                    root.request-send-tokens();
+                }
             }
         }
     }    
