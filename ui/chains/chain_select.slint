@@ -1,4 +1,4 @@
-import { Button } from "std-widgets.slint";
+import { Button , VerticalBox} from "std-widgets.slint";
 import { Chain } from "chain.slint";
 
 export component ChainSelect {
@@ -8,7 +8,7 @@ export component ChainSelect {
 
     callback select-chain(Chain) -> Chain;
 
-    VerticalLayout {
+    VerticalBox {
         tab_bar := HorizontalLayout {
             spacing: 3px;
             Button {
