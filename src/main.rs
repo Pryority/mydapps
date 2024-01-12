@@ -2,26 +2,27 @@ slint::include_modules!();
 // slint::slint!(import { DappTile } from "../ui/dapps/dapp_tile.slint";);
 
 fn main() -> Result<(), slint::PlatformError> {
-    let ui = AppWindow::new()?;
-    let ui_handle = ui.as_weak();
+    // Create an instance of the generated component
+    let mut ui = AppWindow::new()?;
 
-    // let dapp_tile = DappTile::new()?;
-    // let dapp_tile_handle = dapp_tile.as_weak();
+    // Clone strong handles for properties
+    let active_dapp_handle = ui.as_weak();
+    let active_chain_handle = ui.as_weak();
 
     // DAPPS ----------------------------------
-
-    // ui.on_request_open_dapp(move || {
-    //     let ui = ui_handle.unwrap();
-    //     // println!("{}", ui.get_active_dapp());
-    //     ui.set_active_dapp(ui.get_active_dapp());
-    // });
-
     ui.on_select_dapp(move |d| {
-        let ui = ui_handle.unwrap();
+        let ui = active_dapp_handle.unwrap();
         ui.set_active_dapp(d.clone());
         let dapp = ui.get_active_dapp();
-        // println!("main.rs Passed-In dapp: {:?}", d);
         println!("Active Dapp: {:?}", dapp.name);
+    });
+
+    ui.on_select_chain(move |c| {
+        let ui = active_chain_handle.unwrap();
+        let chain = ui.get_active_chain();
+        println!("Active Chain: {:?}", chain.name);
+        ui.set_active_chain(c.clone());
+        println!("New Active Chain: {:?}", chain.name);
     });
 
     // PERSONAL -------------------------------

@@ -1,13 +1,10 @@
 import { Button, VerticalBox, StandardListView, LineEdit } from "std-widgets.slint";
-import { ChainSelect } from "chain_select.slint";
+import { ChainSelect } from "chains/chain_select.slint";
 import { DappGrid } from "dapps/dapp_grid.slint";
 import { SendSVG } from "send_svg.slint";
 import { SendButton } from "send_button.slint";
 import { Dapp } from "dapps/dapp.slint";
-export struct Chain {
-    name: string,
-    chain_id: int,
-}
+import { Chain } from "chains/chain.slint";
 
 global App {
     in-out property <Dapp> dapp;
@@ -22,26 +19,39 @@ export component AppWindow inherits Window {
     in-out property<Dapp> active-dapp: App.dapp;
     in property <[int]> balances;
 
-    // callback request-open-dapp();
     callback request-all-balances <=> BALANCES_btn.clicked;
     callback request-send-tokens();
     callback select-dapp(Dapp);
+    callback select-chain(Chain);
     callback dapp-changed();
 
     VerticalBox {
-        ChainSelect {}
+        ChainSelect {
+            select-chain => {
+                debug("AppWindow Chain: ", self.active-chain.name);
+                root.select-chain(self.active-chain);
+                return self.active-chain;
+            }
+        }
+
 
         DappGrid {
             select-dapp => {
-                debug("AppWindow: ", self.active-dapp.name);
+                debug("AppWindow Dapp: ", self.active-dapp.name);
                 root.select-dapp(self.active-dapp);
                 return self.active-dapp;
             }
         }
 
-        Text {
-            text: "Active: " + root.active-chain.name; 
-            height: 32px;
+        VerticalLayout {
+            Text {
+                text: "Active Chain: " + root.active-chain.name; 
+                height: 32px;
+            }
+
+            Text {
+                text: "Connected Dapp: " + root.active-dapp.name;
+            }
         }
 
         BALANCES_btn := Button {
