@@ -22,15 +22,22 @@ export component AppWindow inherits Window {
     in-out property<Dapp> active-dapp: App.dapp;
     in property <[int]> balances;
 
-    callback request-open-dapp();
+    // callback request-open-dapp();
     callback request-all-balances <=> BALANCES_btn.clicked;
     callback request-send-tokens();
-    callback request-dapp-config(Dapp);
+    callback select-dapp(Dapp);
+    callback dapp-changed();
 
     VerticalBox {
         ChainSelect {}
 
-        DappGrid {}
+        DappGrid {
+            select-dapp => {
+                debug("AppWindow: ", self.active-dapp.name);
+                root.select-dapp(self.active-dapp);
+                return self.active-dapp;
+            }
+        }
 
         Text {
             text: "Active: " + root.active-chain.name; 

@@ -1,9 +1,14 @@
 import { UniswapTile } from "tiles/uniswap_tile.slint";
 import { SafeTile } from "tiles/safe_tile.slint";
 import { GridBox } from "std-widgets.slint";
+import { Dapp } from "dapp.slint";
+
 export component DappGrid {
     height: 256px;
-    
+    in-out property <Dapp> active-dapp;
+    callback select-dapp(Dapp) -> Dapp;
+    callback request-send-tokens();
+
     Rectangle {
         max-height: 256px;
         background: #f7f7f7;
@@ -13,8 +18,23 @@ export component DappGrid {
         GridBox {
             // width: 80%;
             Row {
-                UniswapTile {}
-                SafeTile {}
+                UniswapTile {
+                    select-dapp => {
+                        debug("UniswapTile:", self.dapp);
+                        root.select-dapp(self.dapp);
+                        active-dapp = self.dapp;
+                        return active-dapp;
+                    } 
+                }
+                
+                SafeTile {
+                    select-dapp => {
+                        debug("SafeTile:", self.dapp);
+                        root.select-dapp(self.dapp);
+                        active-dapp = self.dapp;
+                        return active-dapp;
+                    } 
+                }
                 // SafeTile {}
             }
             // Row {

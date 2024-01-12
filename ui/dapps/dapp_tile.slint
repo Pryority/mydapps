@@ -3,12 +3,14 @@ import { Dapp } from "dapp.slint";
 export component DappTile inherits TouchArea {
     horizontal-stretch: 100;
     vertical-stretch: 100;
-    in property <Dapp> dapp;
-    // callback request-dapp-config(Dapp);
+    in-out property <Dapp> dapp;
+    callback select-dapp(Dapp);
+    callback request-send-tokens();
 
-    // clicked => {
-    //     root.request-dapp-config(dapp);
-    // }
+    clicked => {
+        debug("DappTile: ", root.dapp);
+        root.select-dapp(self.dapp);
+    }
 
     Image {
         source: dapp.logo;
