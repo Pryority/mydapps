@@ -38,23 +38,14 @@ async fn main() -> Result<(), Report> {
         "Built client on network \"{}\" with external checkpoint fallbacks",
         Network::MAINNET
     );
-
-    client.start().await.unwrap();
-    client.wait_synced().await;
     
-    let head_block_num = client.get_block_number().await.unwrap();
-    println!("synced up to block: {}", head_block_num);
-
     // Create an instance of the generated component
     let ui = AppWindow::new()?;
-
     // Clone strong handles for properties
     let client_handle = ui.as_weak();
     let active_dapp_handle = ui.as_weak();
     let active_chain_handle = ui.as_weak();
     let checkpoint_handle = ui.as_weak();
-
-    // HELIOS ---------------------------------
     let cf = checkpoints::CheckpointFallback::new()
         .build()
         .await
@@ -66,10 +57,18 @@ async fn main() -> Result<(), Report> {
         .await
         .unwrap();
 
-    // ui.on_sync(move || {
-    //     let ui = client_handle.unwrap();
-    //     ui.set_sync_status(synced());
-    // });
+    // Start the client
+    let client_start = std::time::Instant::now();
+    let start_result = start_client(&mut client).await?;
+    let client_end = std::time::Instant::now();
+    let start_duration = format!("{:?}", client_end - client_start);
+    println!("Client started: {} -- Took {} seconds", start_result, start_duration);
+
+    let wait_synced_start = std::time::Instant::now();
+    sync(&mut client);
+    let wait_synced_end = std::time::Instant::now();
+    let sync_duration = format!("{:?}", wait_synced_end - wait_synced_start);
+    println!("Client synced -- Took {} seconds", sync_duration);
 
     ui.on_fetch_latest_mainnet_checkpoint(move || {
         let ui = checkpoint_handle.unwrap();
@@ -105,5 +104,30 @@ async fn main() -> Result<(), Report> {
         println!("100 ETH, 30,000 OP, 4.2 BTC");
     });
 
-    Ok(ui.run()?)
+    ui.on_sync(move || {
+        let wait_synced_start = std::time::Instant::now();
+        sync(&mut client);
+        let wait_synced_end = std::time::Instant::now();
+        let sync_duration = format!("{:?}", wait_synced_end - wait_synced_start);
+        println!("Client synced -- Took {} seconds", sync_duration);
+        let ui = client_handle.unwrap();
+        ui.set_sync_status(true);
+    });
+
+
+    ui.run()?;
+
+    Ok(())
+}
+
+// Function to start the client
+async fn start_client(client: &mut Client<FileDB>) -> Result<bool, Report> {
+    client.start().await?;
+    Ok(true)
+}
+
+// Function to wait until the client is synced
+fn sync(client: &mut Client<FileDB>) -> Result<bool, Report> {
+    client.wait_synced();
+    Ok(true)
 }
