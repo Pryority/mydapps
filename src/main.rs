@@ -67,7 +67,7 @@ async fn main() -> Result<(), Report> {
     start_client(&mut client).await?;
     let client_end = std::time::Instant::now();
     let start_duration = format!("{:?}", client_end - client_start);
-    println!("\t🟢 Client started: in {} seconds", start_duration);
+    println!("\t🟢 Client started in {}", start_duration);
 
     ui_callbacks::setup(
         &ui,
@@ -82,7 +82,7 @@ async fn main() -> Result<(), Report> {
     let _ = sync(&mut client).await;
     let wait_synced_end = std::time::Instant::now();
     let sync_duration = format!("{:?}", wait_synced_end - wait_synced_start);
-    println!("\t🧬 Client synced in {} seconds", sync_duration);
+    println!("\t🧬 Client synced in {:.5} seconds", sync_duration);
 
     // Get the block number and update the UI
     let head_block_num = client.get_block_number().await.unwrap();
