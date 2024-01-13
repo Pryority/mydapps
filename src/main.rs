@@ -41,7 +41,7 @@ async fn main() -> Result<(), Report> {
     );
 
     // Create an instance of the generated component
-    let mut ui = AppWindow::new()?;
+    let ui = AppWindow::new()?;
     // Clone strong handles for properties
     let client_handle = ui.as_weak();
     let active_dapp_handle = ui.as_weak();
@@ -71,7 +71,7 @@ async fn main() -> Result<(), Report> {
 
     // Spawn a task for synchronization
     let wait_synced_start = std::time::Instant::now();
-    sync(&mut client).await;
+    let _ = sync(&mut client).await;
     let wait_synced_end = std::time::Instant::now();
     let sync_duration = format!("{:?}", wait_synced_end - wait_synced_start);
     println!("Client synced -- Took {} seconds", sync_duration);
@@ -116,7 +116,7 @@ async fn main() -> Result<(), Report> {
     ui.on_sync(move || {
         let ui = client_handle.unwrap();
         let wait_synced_start = std::time::Instant::now();
-        sync(&mut client);
+        let _ = sync(&mut client);
         let wait_synced_end = std::time::Instant::now();
         let sync_duration = format!("{:?}", wait_synced_end - wait_synced_start);
         println!("Client synced -- Took {} seconds", sync_duration);
