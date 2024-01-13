@@ -1,30 +1,31 @@
 slint::include_modules!();
 use dotenv::dotenv;
-use std::{path::PathBuf};
+use eyre::Report;
 use helios::{
-    client::{ClientBuilder, Client, FileDB},
+    client::{Client, ClientBuilder, FileDB},
     config::{checkpoints, networks, networks::Network},
 };
+use std::path::PathBuf;
 use tracing::info;
-use eyre::Report;
 
 #[tokio::main]
 async fn main() -> Result<(), Report> {
     dotenv().ok();
     let untrusted_rpc_url = std::env::var("EXECUTION")
-    .expect("Please set the 'EXECUTION' environment variable with the RPC URL");
+        .expect("Please set the 'EXECUTION' environment variable with the RPC URL");
     info!("Using untrusted RPC URL [REDACTED]");
 
     let consensus_rpc = "https://www.lightclientdata.org";
     info!("Using consensus RPC URL: {}", consensus_rpc);
 
     let mut client: Client<FileDB> = match ClientBuilder::new()
-    .network(Network::MAINNET)
-    .consensus_rpc(consensus_rpc)
-    .execution_rpc(&untrusted_rpc_url)
-    .load_external_fallback()
-    .data_dir(PathBuf::from("/tmp/helios"))
-    .build() {
+        .network(Network::MAINNET)
+        .consensus_rpc(consensus_rpc)
+        .execution_rpc(&untrusted_rpc_url)
+        .load_external_fallback()
+        .data_dir(PathBuf::from("/tmp/helios"))
+        .build()
+    {
         Ok(client) => client,
         Err(err) => {
             // Handle the error here, log it, print a message, etc.
@@ -38,9 +39,9 @@ async fn main() -> Result<(), Report> {
         "Built client on network \"{}\" with external checkpoint fallbacks",
         Network::MAINNET
     );
-    
+
     // Create an instance of the generated component
-    let ui = AppWindow::new()?;
+    let mut ui = AppWindow::new()?;
     // Clone strong handles for properties
     let client_handle = ui.as_weak();
     let active_dapp_handle = ui.as_weak();
@@ -56,19 +57,28 @@ async fn main() -> Result<(), Report> {
         .fetch_latest_checkpoint(&networks::Network::MAINNET)
         .await
         .unwrap();
+    ui.set_latest_checkpoint(mainnet_checkpoint.to_string().into());
 
     // Start the client
     let client_start = std::time::Instant::now();
     let start_result = start_client(&mut client).await?;
     let client_end = std::time::Instant::now();
     let start_duration = format!("{:?}", client_end - client_start);
-    println!("Client started: {} -- Took {} seconds", start_result, start_duration);
+    println!(
+        "Client started: {} -- Took {} seconds",
+        start_result, start_duration
+    );
 
+    // Spawn a task for synchronization
     let wait_synced_start = std::time::Instant::now();
-    sync(&mut client);
+    sync(&mut client).await;
     let wait_synced_end = std::time::Instant::now();
     let sync_duration = format!("{:?}", wait_synced_end - wait_synced_start);
     println!("Client synced -- Took {} seconds", sync_duration);
+
+    // Get the block number and update the UI
+    let head_block_num = client.get_block_number().await.unwrap();
+    ui.set_block_number(head_block_num.to_string().into());
 
     ui.on_fetch_latest_mainnet_checkpoint(move || {
         let ui = checkpoint_handle.unwrap();
@@ -90,9 +100,8 @@ async fn main() -> Result<(), Report> {
     ui.on_select_chain(move |c| {
         let ui = active_chain_handle.unwrap();
         let chain = ui.get_active_chain();
-        println!("Active Chain: {:?}", chain.name);
         ui.set_active_chain(c.clone());
-        println!("New Active Chain: {:?}", chain.name);
+        println!("Active Chain: {:?}", chain.name);
     });
 
     // PERSONAL -------------------------------
@@ -105,15 +114,14 @@ async fn main() -> Result<(), Report> {
     });
 
     ui.on_sync(move || {
+        let ui = client_handle.unwrap();
         let wait_synced_start = std::time::Instant::now();
         sync(&mut client);
         let wait_synced_end = std::time::Instant::now();
         let sync_duration = format!("{:?}", wait_synced_end - wait_synced_start);
         println!("Client synced -- Took {} seconds", sync_duration);
-        let ui = client_handle.unwrap();
         ui.set_sync_status(true);
     });
-
 
     ui.run()?;
 
@@ -127,7 +135,8 @@ async fn start_client(client: &mut Client<FileDB>) -> Result<bool, Report> {
 }
 
 // Function to wait until the client is synced
-fn sync(client: &mut Client<FileDB>) -> Result<bool, Report> {
-    client.wait_synced();
+async fn sync(client: &mut Client<FileDB>) -> Result<bool, Report> {
+    // Clone strong handles for properties
+    client.wait_synced().await;
     Ok(true)
 }

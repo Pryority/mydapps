@@ -18,8 +18,9 @@ export component AppWindow inherits Window {
     in-out property<Chain> active-chain: App.chain;
     in-out property<Dapp> active-dapp: App.dapp;
     in property <[int]> balances;
-    in property <string> latest_checkpoint;
-    in-out property <bool> sync_status;
+    in property <string> latest-checkpoint;
+    in-out property <bool> sync-status;
+    in property <string> block-number;
 
     callback request-all-balances <=> BALANCES_btn.clicked;
     callback request-send-tokens();
@@ -28,6 +29,8 @@ export component AppWindow inherits Window {
     callback dapp-changed();
     callback fetch-latest-mainnet-checkpoint();
     callback sync();
+    callback latest-block-number();
+    // callback get-dai-supply();
 
     VerticalBox {
         ChainSelect {
@@ -49,12 +52,12 @@ export component AppWindow inherits Window {
 
         VerticalLayout {
             Text {
-                text: "Active Chain: " + root.active-chain.name; 
+                text: root.active-chain.name == "" ? "Active Chain: ---" : "Active Chain: " + root.active-chain.name;
                 height: 32px;
             }
 
             Text {
-                text: "Connected Dapp: " + root.active-dapp.name;
+                text: root.active-dapp.name == "" ? "Connected Dapp: ---" : "Connected Dapp: " + root.active-dapp.name;
             }
         }
 
@@ -74,6 +77,7 @@ export component AppWindow inherits Window {
                         clicked => {
                             root.fetch-latest-mainnet-checkpoint();
                             root.sync();
+                            // root.get-block-number();
                         }
                     }
                     Button {
@@ -91,11 +95,56 @@ export component AppWindow inherits Window {
                 Text {
                     text: "Latest Checkpoint: " + root.latest-checkpoint;
                 }
+
+                Text {
+                    text: "Latest Block: " + root.block-number;
+                }
             } 
             SendButton {
                 request-send-tokens => {
                     root.request-send-tokens();
                 }
+            }
+            Rectangle {
+                height: 80px;
+                property <bool> send_seq_active: true;
+            
+                // callback request-send-tokens();
+                
+                re := TouchArea {
+                    width: 80px;
+                    height: 40px;
+                    clicked => {
+                        send_seq_active = !send_seq_active;
+                        root.request-send-tokens();
+                    }
+                    container := Rectangle {
+                        background: re.pressed ? #248d6a : #bababa;
+                        border-radius: 4px;
+                        animate background {
+                            duration: 20ms;
+                        }
+                        HorizontalBox {
+                            padding-right: 40px;
+                            spacing: 24px;
+                            alignment: center;
+                            
+                            HorizontalLayout {
+                                spacing: 16px;
+                                btnText := Text {
+                                    text: "Receive";
+                                    color: re.pressed ? #0d1106 : #1e1e1e;
+                                }
+                            }
+                        }
+                    }
+                } 
+                states [
+                    active-hover when !re.pressed && re.has-hover: {
+                        container.background: #2abc8b;
+                        btnText.color: #0f1308;
+                    }
+                ]
             }
         }
     }    
