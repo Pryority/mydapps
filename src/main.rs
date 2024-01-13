@@ -10,75 +10,87 @@ use tracing::info;
 
 mod ui_callbacks;
 
+struct AppState {
+    ui: AppWindow,
+    client: Client<FileDB>,
+}
+
+impl AppState {
+    async fn new() -> Result<Self, Report> {
+        dotenv().ok();
+
+        // Initialize the Helios light client
+        let client = init_client()?;
+        println!(
+            "\t🏗️  Client built on \"{}\" with external checkpoint fallbacks",
+            Network::MAINNET
+        );
+
+        // Create an instance of the generated component
+        let ui = AppWindow::new()?;
+        let cf = checkpoints::CheckpointFallback::new()
+            .build()
+            .await
+            .unwrap();
+        let cf_clone = cf.clone();
+
+        let mainnet_checkpoint = cf_clone
+            .fetch_latest_checkpoint(&networks::Network::MAINNET)
+            .await
+            .unwrap();
+        ui.set_latest_checkpoint(mainnet_checkpoint.to_string().into());
+
+        Ok(AppState { ui, client })
+    }
+
+    async fn start(&mut self) -> Result<(), Report> {
+        let start_time = std::time::Instant::now();
+        start_client(&mut self.client).await?;
+        let duration = format!("{:?}", std::time::Instant::now() - start_time);
+        println!("\t🟢 Client started in {}", duration);
+        Ok(())
+    }
+
+    async fn sync(&mut self) -> Result<(), Report> {
+        let sync_start_time = std::time::Instant::now();
+        sync_client(&mut self.client).await?;
+        let duration = format!("{:?}", std::time::Instant::now() - sync_start_time);
+        println!("\t🧬 Client synced in {:.5} seconds", duration);
+
+        // Get the block number and update the UI
+        let head_block_num = self.client.get_block_number().await.unwrap();
+        self.ui.set_block_number(head_block_num.to_string().into());
+
+        Ok(())
+    }
+
+    fn setup_ui_callbacks(&self) {
+        // let client_handle = self.ui.as_weak();
+        let active_dapp_handle = self.ui.as_weak();
+        let active_chain_handle = self.ui.as_weak();
+        // let checkpoint_handle = self.ui.as_weak();
+
+        ui_callbacks::setup(
+            &self.ui,
+            // &mainnet_checkpoint,
+            // checkpoint_handle.clone(),
+            active_dapp_handle.clone(),
+            active_chain_handle.clone(),
+        );
+    }
+
+    fn run_ui(&self) {
+        self.ui.run().unwrap();
+    }
+}
+
 #[tokio::main]
 async fn main() -> Result<(), Report> {
-    dotenv().ok();
-
-    // Initialize the Helios light client
-    let mut client = init_client()?;
-    println!(
-        "\t🏗️  Client built on \"{}\" with external checkpoint fallbacks",
-        Network::MAINNET
-    );
-
-    // Create an instance of the generated component
-    let ui = AppWindow::new()?;
-
-    let client_handle = ui.as_weak();
-    let active_dapp_handle = ui.as_weak();
-    let active_chain_handle = ui.as_weak();
-    let checkpoint_handle = ui.as_weak();
-
-    let cf = checkpoints::CheckpointFallback::new()
-        .build()
-        .await
-        .unwrap();
-    let cf_clone = cf.clone();
-
-    let mainnet_checkpoint = cf_clone
-        .fetch_latest_checkpoint(&networks::Network::MAINNET)
-        .await
-        .unwrap();
-    ui.set_latest_checkpoint(mainnet_checkpoint.to_string().into());
-
-    // Start the client
-    let client_start = std::time::Instant::now();
-    // let start_result = start_client(&mut client).await?;
-    start_client(&mut client).await?;
-    let client_end = std::time::Instant::now();
-    let start_duration = format!("{:?}", client_end - client_start);
-    println!("\t🟢 Client started in {}", start_duration);
-
-    ui_callbacks::setup(
-        &ui,
-        mainnet_checkpoint,
-        checkpoint_handle.clone(),
-        active_dapp_handle.clone(),
-        active_chain_handle.clone(),
-    );
-
-    // Spawn a task for synchronization
-    let wait_synced_start = std::time::Instant::now();
-    let _ = sync(&mut client).await;
-    let wait_synced_end = std::time::Instant::now();
-    let sync_duration = format!("{:?}", wait_synced_end - wait_synced_start);
-    println!("\t🧬 Client synced in {:.5} seconds", sync_duration);
-
-    // Get the block number and update the UI
-    let head_block_num = client.get_block_number().await.unwrap();
-    ui.set_block_number(head_block_num.to_string().into());
-
-    ui.on_sync(move || {
-        let ui = client_handle.unwrap();
-        let wait_synced_start = std::time::Instant::now();
-        let _ = sync(&mut client);
-        let wait_synced_end = std::time::Instant::now();
-        let sync_duration = format!("{:?}", wait_synced_end - wait_synced_start);
-        println!("Client synced -- Took {} seconds", sync_duration);
-        ui.set_sync_status(true);
-    });
-
-    ui.run().unwrap();
+    let mut app_state = AppState::new().await?;
+    app_state.setup_ui_callbacks();
+    app_state.start().await?;
+    app_state.sync().await?;
+    app_state.run_ui();
 
     Ok(())
 }
@@ -123,7 +135,7 @@ async fn start_client(client: &mut Client<FileDB>) -> Result<bool, Report> {
 }
 
 // Function to wait until the client is synced
-async fn sync(client: &mut Client<FileDB>) -> Result<bool, Report> {
+async fn sync_client(client: &mut Client<FileDB>) -> Result<bool, Report> {
     // Clone strong handles for properties
     println!("\t⏳ Client is awaiting synchronization...");
     client.wait_synced().await;
