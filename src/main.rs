@@ -53,7 +53,7 @@ impl AppState {
 
     async fn sync(&mut self) -> Result<(), Report> {
         let sync_start_time = std::time::Instant::now();
-        sync_client(&mut self.client).await?;
+        sync_client(&mut self.client, &mut self.ui).await?;
         let duration = format!("{:?}", std::time::Instant::now() - sync_start_time);
         println!("\t🧬 Client synced in {:.5} seconds", duration);
 
@@ -135,9 +135,17 @@ async fn start_client(client: &mut Client<FileDB>) -> Result<bool, Report> {
 }
 
 // Function to wait until the client is synced
-async fn sync_client(client: &mut Client<FileDB>) -> Result<bool, Report> {
-    // Clone strong handles for properties
+async fn sync_client(client: &mut Client<FileDB>, ui: &mut AppWindow) -> Result<bool, Report> {
     println!("\t⏳ Client is awaiting synchronization...");
     client.wait_synced().await;
+
+    ui.set_sync_status(true);
     Ok(true)
 }
+
+// async fn poll_sync(client: &mut Client<FileDB>) {
+//     loop {
+//         client.get_block_number();
+//         println!("")
+//     }
+// }
