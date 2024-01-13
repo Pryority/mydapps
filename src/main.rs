@@ -8,6 +8,8 @@ use helios::{
 use std::path::PathBuf;
 use tracing::info;
 
+mod ui_callbacks;
+
 #[tokio::main]
 async fn main() -> Result<(), Report> {
     dotenv().ok();
@@ -67,38 +69,13 @@ async fn main() -> Result<(), Report> {
     let start_duration = format!("{:?}", client_end - client_start);
     println!("\t🟢 Client started: in {} seconds", start_duration);
 
-    ui.on_fetch_latest_mainnet_checkpoint(move || {
-        let ui = checkpoint_handle.unwrap();
-
-        // Fetch the latest mainnet checkpoint
-        println!("Fetched latest mainnet checkpoint: {mainnet_checkpoint}");
-        ui.set_latest_checkpoint(mainnet_checkpoint.to_string().into());
-    });
-
-    // DAPPS ----------------------------------
-    ui.on_select_dapp(move |d| {
-        let ui = active_dapp_handle.unwrap();
-        ui.set_active_dapp(d.clone());
-        let dapp = ui.get_active_dapp();
-        println!("Active Dapp: {:?}", dapp.name);
-    });
-
-    // CHAINS ---------------------------------
-    ui.on_select_chain(move |c| {
-        let ui = active_chain_handle.unwrap();
-        let chain = ui.get_active_chain();
-        ui.set_active_chain(c.clone());
-        println!("Active Chain: {:?}", chain.name);
-    });
-
-    // PERSONAL -------------------------------
-    ui.on_request_send_tokens(move || {
-        println!("Initiating SEND sequence.");
-    });
-
-    ui.on_request_all_balances(move || {
-        println!("100 ETH, 30,000 OP, 4.2 BTC");
-    });
+    ui_callbacks::setup(
+        &ui,
+        mainnet_checkpoint,
+        checkpoint_handle.clone(),
+        active_dapp_handle.clone(),
+        active_chain_handle.clone(),
+    );
 
     // Spawn a task for synchronization
     let wait_synced_start = std::time::Instant::now();
