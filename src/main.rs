@@ -13,30 +13,9 @@ mod ui_callbacks;
 #[tokio::main]
 async fn main() -> Result<(), Report> {
     dotenv().ok();
-    let untrusted_rpc_url = std::env::var("EXECUTION")
-        .expect("Please set the 'EXECUTION' environment variable with the RPC URL");
-    info!("Using untrusted RPC URL [REDACTED]");
 
-    let consensus_rpc = "https://www.lightclientdata.org";
-    info!("Using consensus RPC URL: {}", consensus_rpc);
-
-    let mut client: Client<FileDB> = match ClientBuilder::new()
-        .network(Network::MAINNET)
-        .consensus_rpc(consensus_rpc)
-        .execution_rpc(&untrusted_rpc_url)
-        .load_external_fallback()
-        .data_dir(PathBuf::from("/tmp/helios"))
-        .build()
-    {
-        Ok(client) => client,
-        Err(err) => {
-            // Handle the error here, log it, print a message, etc.
-            // For now, let's print the error to the console.
-            eprintln!("Error building Helios client: {}", err);
-            return Err(err);
-        }
-    };
-
+    // Initialize the Helios light client
+    let mut client = init_client()?;
     println!(
         "\t🏗️  Client built on \"{}\" with external checkpoint fallbacks",
         Network::MAINNET
@@ -44,11 +23,12 @@ async fn main() -> Result<(), Report> {
 
     // Create an instance of the generated component
     let ui = AppWindow::new()?;
-    // Clone strong handles for properties
+
     let client_handle = ui.as_weak();
     let active_dapp_handle = ui.as_weak();
     let active_chain_handle = ui.as_weak();
     let checkpoint_handle = ui.as_weak();
+
     let cf = checkpoints::CheckpointFallback::new()
         .build()
         .await
@@ -102,6 +82,38 @@ async fn main() -> Result<(), Report> {
 
     Ok(())
 }
+
+// SYNCHRONOUS FUNCTIONS ----------------------------------
+
+fn init_client() -> Result<Client<FileDB>, Report> {
+    let untrusted_rpc_url = std::env::var("EXECUTION")
+        .expect("Please set the 'EXECUTION' environment variable with the RPC URL");
+    info!("Using untrusted RPC URL [REDACTED]");
+
+    let consensus_rpc = "https://www.lightclientdata.org";
+    info!("Using consensus RPC URL: {}", consensus_rpc);
+
+    let client: Client<FileDB> = match ClientBuilder::new()
+        .network(Network::MAINNET)
+        .consensus_rpc(consensus_rpc)
+        .execution_rpc(&untrusted_rpc_url)
+        .load_external_fallback()
+        .data_dir(PathBuf::from("/tmp/helios"))
+        .build()
+    {
+        Ok(client) => client,
+        Err(err) => {
+            // Handle the error here, log it, print a message, etc.
+            // For now, let's print the error to the console.
+            eprintln!("Error building Helios client: {}", err);
+            return Err(err);
+        }
+    };
+
+    Ok(client)
+}
+
+// ASYNCHRONOUS FUNCTIONS ---------------------------------
 
 // Function to start the client
 async fn start_client(client: &mut Client<FileDB>) -> Result<bool, Report> {
