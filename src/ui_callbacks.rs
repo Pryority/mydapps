@@ -1,27 +1,27 @@
 // ui_callbacks.rs
 
 use crate::AppWindow;
-use ethers::types::H256;
+// use ethers::types::H256;
 use slint::Weak;
 use std::borrow::{Borrow, BorrowMut};
 
 pub fn setup(
     ui: &AppWindow,
-    mainnet_checkpoint: H256,
-    checkpoint_handle: Weak<AppWindow>,
+    // mainnet_checkpoint: H256,
+    // checkpoint_handle: Weak<AppWindow>,
     active_dapp_handle: Weak<AppWindow>,
     active_chain_handle: Weak<AppWindow>,
 ) {
-    ui.on_fetch_latest_mainnet_checkpoint(move || {
-        let mut ui = checkpoint_handle
-            .upgrade()
-            .expect("Failed to upgrade checkpoint handle");
+    // ui.on_fetch_latest_mainnet_checkpoint(move || {
+    //     let mut ui = checkpoint_handle
+    //         .upgrade()
+    //         .expect("Failed to upgrade checkpoint handle");
 
-        // Fetch the latest mainnet checkpoint
-        println!("Fetched latest mainnet checkpoint: {mainnet_checkpoint}");
-        ui.borrow_mut()
-            .set_latest_checkpoint(mainnet_checkpoint.to_string().into());
-    });
+    //     // Fetch the latest mainnet checkpoint
+    //     println!("Fetched latest mainnet checkpoint: {mainnet_checkpoint}");
+    //     ui.borrow_mut()
+    //         .set_latest_checkpoint(mainnet_checkpoint.to_string().into());
+    // });
 
     // DAPPS ----------------------------------
     ui.on_select_dapp(move |d| {
