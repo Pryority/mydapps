@@ -15,6 +15,8 @@ eyre = "0.6.8"
 ethers = "2.0.11"
 tracing = "0.1.40"
 dotenv = "0.15.0"
+indicatif = "0.17.7"
+thiserror = "1.0.63"
 
 [build-dependencies]
 slint-build = "1.0"

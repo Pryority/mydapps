@@ -8,19 +8,19 @@ import { Chain } from "chains/chain.slint";
 
 global App {
     in-out property <Dapp> dapp;
-    in-out property <Chain> chain: {name: "Ethereum", chain_id: 1};
+    in-out property <Chain> chain: { name: "Ethereum", chain_id: 1 };
 }
 
 export component AppWindow inherits Window {
     title: "MyDapps";
     preferred-height: 800px;
     min-width: 400px;
-    in-out property<Chain> active-chain: App.chain;
-    in-out property<Dapp> active-dapp: App.dapp;
-    in property <[int]> balances;
-    in property <string> latest-checkpoint;
+    in-out property <Chain> active-chain: App.chain;
+    in-out property <Dapp> active-dapp: App.dapp;
+    in-out property <[int]> balances;
+    in-out property <string> latest-checkpoint;
     in-out property <bool> sync-status;
-    in property <string> block-number;
+    in-out property <string> block-number;
 
     callback request-all-balances <=> BALANCES_btn.clicked;
     callback request-send-tokens();
@@ -40,7 +40,6 @@ export component AppWindow inherits Window {
                 return self.active-chain;
             }
         }
-
 
         DappGrid {
             select-dapp => {
@@ -69,7 +68,7 @@ export component AppWindow inherits Window {
                     text: "Balances";
                     height: 32px;
                 }
-            
+
                 HorizontalBox {
                     Button {
                         text: "Sync";
@@ -80,6 +79,7 @@ export component AppWindow inherits Window {
                             // root.get-block-number();
                         }
                     }
+
                     Button {
                         text: "⏸️";
                         clicked => {
@@ -99,18 +99,20 @@ export component AppWindow inherits Window {
                 Text {
                     text: "Latest Block: " + root.block-number;
                 }
-            } 
+            }
+
             SendButton {
                 request-send-tokens => {
                     root.request-send-tokens();
                 }
             }
+
             Rectangle {
                 height: 80px;
                 property <bool> send_seq_active: true;
-            
+
                 // callback request-send-tokens();
-                
+
                 re := TouchArea {
                     width: 80px;
                     height: 40px;
@@ -121,14 +123,12 @@ export component AppWindow inherits Window {
                     container := Rectangle {
                         background: re.pressed ? #248d6a : #bababa;
                         border-radius: 4px;
-                        animate background {
-                            duration: 20ms;
-                        }
+                        animate background { duration: 20ms; }
                         HorizontalBox {
                             padding-right: 40px;
                             spacing: 24px;
                             alignment: center;
-                            
+
                             HorizontalLayout {
                                 spacing: 16px;
                                 btnText := Text {
@@ -138,7 +138,8 @@ export component AppWindow inherits Window {
                             }
                         }
                     }
-                } 
+                }
+
                 states [
                     active-hover when !re.pressed && re.has-hover: {
                         container.background: #2abc8b;
@@ -147,5 +148,5 @@ export component AppWindow inherits Window {
                 ]
             }
         }
-    }    
+    }
 }
