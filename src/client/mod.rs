@@ -1,5 +1,6 @@
 mod init;
 
+use ethers::types::U256;
 use indicatif::{ProgressBar, ProgressStyle};
 
 use crate::{error::Result, AppError};
@@ -52,9 +53,9 @@ impl Helios {
             ProgressStyle::default_spinner()
                 .template("{prefix:.cyan} {spinner:.green} {msg}")
                 .unwrap()
-                .tick_strings(&["🌍", "🌍", "🌎", "🌎", "🌏", "🌏"]),
+                .tick_strings(&["🌍", "🌍", "🌍", "🌎", "🌎", "🌎", "🌏", "🌏", "🌏"]),
         );
-        progress_bar.set_prefix(" Syncing");
+        progress_bar.set_prefix("Syncing. Please wait. This usually takes ~1 minute.");
 
         // Spawn a task to update the progress bar
         let progress_bar_clone = progress_bar.clone();
@@ -78,5 +79,11 @@ impl Helios {
         println!("🧬 Client synced in {:.5} seconds", duration);
 
         Ok(())
+    }
+    pub async fn get_block_number(&self) -> Result<U256> {
+        self.inner
+            .get_block_number()
+            .await
+            .map_err(|e| AppError::BlockNotFound(e.downcast::<BlockNotFoundError>().unwrap()))
     }
 }

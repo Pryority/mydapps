@@ -20,7 +20,8 @@ export component AppWindow inherits Window {
     in-out property <[int]> balances;
     in-out property <string> latest-checkpoint;
     in-out property <bool> sync-status;
-    in-out property <string> block-number;
+    in-out property <int> block-number;
+    in-out property <int> sync-elapsed-time;
 
     callback request-all-balances <=> BALANCES_btn.clicked;
     callback request-send-tokens();

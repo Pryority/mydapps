@@ -14,6 +14,8 @@ async fn main() -> Result<()> {
     app.client.sync().await?;
     app.client.start().await?;
     app.ui.set_sync_status(true);
+    let block_number = app.client.get_block_number().await?;
+    app.ui.set_latest_block(block_number);
 
     app.ui.run()?;
     Ok(())
