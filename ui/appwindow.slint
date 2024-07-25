@@ -31,7 +31,7 @@ export component AppWindow inherits Window {
     callback fetch-latest-mainnet-checkpoint();
     callback sync();
     callback latest-block-number();
-    // callback get-dai-supply();
+    callback update-checkpoint(string);
 
     VerticalBox {
         ChainSelect {
@@ -90,8 +90,21 @@ export component AppWindow inherits Window {
                 }
 
                 Text {
-                    text: root.sync-status == true ? "Synced" : "Paused";
+                    text: root.sync-status == true ? "Synced" : "Out of Sync";
                 }
+
+                checkpoint-input := LineEdit {
+                      placeholder-text: "Enter new checkpoint";
+                  }
+
+                  update-checkpoint-button := Button {
+                      text: "Update Checkpoint";
+                      clicked => {
+                          root.update-checkpoint(checkpoint-input.text);
+                      }
+                  }
+
+
 
                 Text {
                     text: "Latest Checkpoint: " + root.latest-checkpoint;

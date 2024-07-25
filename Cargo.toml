@@ -17,6 +17,7 @@ tracing = "0.1.40"
 dotenv = "0.15.0"
 indicatif = "0.17.7"
 thiserror = "1.0.63"
+parking_lot = "0.12.3"
 
 [build-dependencies]
 slint-build = "1.0"

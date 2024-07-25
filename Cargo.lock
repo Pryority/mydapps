@@ -4817,6 +4817,7 @@ dependencies = [
  "eyre",
  "helios",
  "indicatif",
+ "parking_lot",
  "slint",
  "slint-build",
  "thiserror",
